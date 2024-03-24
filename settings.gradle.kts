@@ -11,4 +11,4 @@ plugins {
 }
 
 rootProject.name = "groovy_lsp"
-include("app", "lib")
+include("app", "lsp")
