@@ -6,12 +6,18 @@ plugins {
     id("buildlogic.kotlin-application-conventions")
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     implementation("org.apache.commons:commons-text")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j:0.22.0")
+    implementation("org.eclipse.lsp4j:org.eclipse.lsp4j.jsonrpc:0.22.0")
     implementation(project(":lsp"))
 }
 
 application {
     // Define the main class for the application.
-    mainClass = "org.groovy_lsp.app.ServerKt"
+    mainClass = "org.groovy_lsp.app.GroovyLanguageServerKt"
 }
