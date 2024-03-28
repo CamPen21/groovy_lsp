@@ -35,10 +35,8 @@ tasks {
     }
 }
 
-tasks {
-    named<ShadowJar>("shadowJar") {
-        manifest {
-            attributes["Main-Class"] = "org.groovy_lsp.app.GroovyLanguageServerKt"
-        }
+tasks.named<ShadowJar>("shadowJar") {
+    manifest {
+        attributes["Main-Class"] = "org.groovy_lsp.app.GroovyLanguageServerKt"
     }
 }

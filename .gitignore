@@ -24,6 +24,7 @@ gradle-app.setting
 # Ignore Gradle build output directory
 build
 **/build/
+**/bin/
 !src/**/build/
 
 ############### Kotlin ignores
@@ -54,3 +55,6 @@ replay_pid*
 # LSP DB
 *.db
 .settings
+
+# LSP local testing files
+*.lua
