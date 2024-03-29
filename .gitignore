@@ -58,3 +58,4 @@ replay_pid*
 
 # LSP local testing files
 *.lua
+*.groovy

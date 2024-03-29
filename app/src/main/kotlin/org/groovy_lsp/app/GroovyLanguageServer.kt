@@ -13,9 +13,11 @@ import org.eclipse.lsp4j.services.LanguageClient
 import org.eclipse.lsp4j.services.LanguageClientAware
 import org.eclipse.lsp4j.launch.LSPLauncher
 import org.eclipse.lsp4j.InitializeParams
+import org.eclipse.lsp4j.jsonrpc.messages.Either;
 import org.eclipse.lsp4j.InitializeResult
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.ServerCapabilities
+import org.eclipse.lsp4j.TextDocumentSyncKind.Incremental
 
 class GroovyLanguageServer: LanguageServer, LanguageClientAware {
 
@@ -24,6 +26,7 @@ class GroovyLanguageServer: LanguageServer, LanguageClientAware {
         val clientVersion = initializeParams.clientInfo.version;
         System.err.println("Client attempting to connect $clientName $clientVersion")
         val serverCapabilities = ServerCapabilities()
+        serverCapabilities.setTextDocumentSync(Incremental)
         val result = InitializeResult(serverCapabilities)
         val promise = CompletableFuture<InitializeResult>()
         promise.complete(result)
