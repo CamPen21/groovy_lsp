@@ -18,8 +18,13 @@ import org.eclipse.lsp4j.InitializeResult
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.ServerCapabilities
 import org.eclipse.lsp4j.TextDocumentSyncKind.Incremental
+import org.eclipse.lsp4j.DiagnosticRegistrationOptions;
 
 class GroovyLanguageServer: LanguageServer, LanguageClientAware {
+
+    private var lspClient: LanguageClient? = null
+    private val textDocumentService = GroovyTextDocumentService()
+    private val workspaceService = GroovyWorkspaceService()
 
     override fun initialize(initializeParams: InitializeParams): CompletableFuture<InitializeResult> {
         val clientName = initializeParams.clientInfo.name;
@@ -27,6 +32,8 @@ class GroovyLanguageServer: LanguageServer, LanguageClientAware {
         System.err.println("Client attempting to connect $clientName $clientVersion")
         val serverCapabilities = ServerCapabilities()
         serverCapabilities.setTextDocumentSync(Incremental)
+        // For now supporting inter file diagnostics, but no workspace diagnostics
+        serverCapabilities.diagnosticProvider = DiagnosticRegistrationOptions(true, false)
         val result = InitializeResult(serverCapabilities)
         val promise = CompletableFuture<InitializeResult>()
         promise.complete(result)
@@ -45,15 +52,16 @@ class GroovyLanguageServer: LanguageServer, LanguageClientAware {
         return
     }
 
-    override fun getTextDocumentService(): TextDocumentService {
-        return GroovyTextDocumentService()
+    override fun getTextDocumentService(): TextDocumentService? {
+        return textDocumentService
     }
 
     override fun getWorkspaceService(): WorkspaceService {
-        return GroovyWorkspaceService()
+        return workspaceService
     }
     override fun connect(client: LanguageClient): Unit {
-
+        lspClient = client
+        textDocumentService.client = client
     }
 
 }

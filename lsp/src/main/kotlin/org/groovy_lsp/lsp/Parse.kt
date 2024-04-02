@@ -2,63 +2,40 @@ package org.groovy_lsp.lsp
 
 import groovy.lang.GroovyShell
 import groovy.lang.Script
-import java.io.File
 import org.codehaus.groovy.control.CompilationFailedException
 import org.codehaus.groovy.control.MultipleCompilationErrorsException
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage
+import org.codehaus.groovy.syntax.SyntaxException;
+import org.eclipse.lsp4j.Diagnostic
+import org.eclipse.lsp4j.Range
+import org.eclipse.lsp4j.Position
+import org.eclipse.lsp4j.DiagnosticSeverity
+import java.util.ArrayList
 
 class Parse {
 
-    fun parseWithErrorPosition(path: String): String {
+    fun parseWithErrorPosition(text: String): List<Diagnostic> {
         val shell = GroovyShell()
-        val groovyFile = File(path)
         try {
-            shell.parse(groovyFile)
+            shell.parse(text)
         } catch (e: MultipleCompilationErrorsException) {
-            val messageBuilder = StringBuilder("Syntax error(s) found:\n")
+            var diagnostics = ArrayList<Diagnostic>()
             e.errorCollector.errors.forEach { error ->
                 if (error is SyntaxErrorMessage) {
-                    val line = error.cause.line
-                    val column = error.cause.startColumn
-                    val message = error.cause.message // 'message' already provides a formatted error message
-                    messageBuilder.append("Line $line, Column $column: $message\n")
+                    val cause: SyntaxException = error.getCause()
+                    val range = Range(Position(cause.startLine-1, cause.startColumn-1),
+                    Position(cause.endLine-1, cause.endColumn-1))
+                    diagnostics.add(Diagnostic(range, cause.message, DiagnosticSeverity.Error, "Compiler"))
                 }
             }
-            return messageBuilder.toString()
+            return diagnostics
         } catch (e: CompilationFailedException) {
             // Catch other compilation failures that might not be MultipleCompilationErrorsException
-            return "Compilation failed: ${e.message}"
+            return ArrayList()
         } catch (e: Exception) {
             // Catch any other exceptions
-            return "An unexpected error occurred: ${e.message}"
+            return ArrayList()
         }
-        return "No syntax errors found."
+        return ArrayList()
     }
-
-    fun parseWithErrorHandling(path: String): String {
-        val shell = GroovyShell()
-        val groovyFile = File(path)
-        try {
-            // Attempt to parse/evaluate the Groovy script file.
-            shell.parse(groovyFile)
-        } catch (e: Exception) {
-            // Catch any exceptions thrown during parsing.
-            // Return the error message (or any specific part of it).
-            return e.message ?: "An error occurred, but no message is available."
-        }
-        // If no exceptions are caught, return an indication that the file is fine.
-        return "No syntax errors found."
-    }
-
-    fun parse(path: String): String {
-        val shell = GroovyShell()
-        val groovyFile = File(path)
-        // Directly execute the script.
-        val result = shell.evaluate(groovyFile) as? Script
-        // Attempt to retrieve a property named 'name' from the script.
-        val nameProperty = result?.getProperty("name")?.toString()
-        // Return the name property if it exists; otherwise, return an empty string.
-        return nameProperty ?: ""
-    }
-
 }
