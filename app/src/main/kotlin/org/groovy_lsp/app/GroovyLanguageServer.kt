@@ -1,6 +1,7 @@
 package org.groovy_lsp.app
 
 import org.groovy_lsp.lsp.Parse
+import org.groovy_lsp.lsp.diagnostics.GroovyDiagnosticsService
 import org.groovy_lsp.textdocument.GroovyTextDocumentService
 import org.groovy_lsp.workspace.GroovyWorkspaceService
 import java.util.concurrent.CompletableFuture
@@ -25,6 +26,7 @@ class GroovyLanguageServer: LanguageServer, LanguageClientAware {
     private var lspClient: LanguageClient? = null
     private val textDocumentService = GroovyTextDocumentService()
     private val workspaceService = GroovyWorkspaceService()
+    private val diagnosticsService = GroovyDiagnosticsService()
 
     override fun initialize(initializeParams: InitializeParams): CompletableFuture<InitializeResult> {
         val clientName = initializeParams.clientInfo.name;
@@ -60,6 +62,7 @@ class GroovyLanguageServer: LanguageServer, LanguageClientAware {
         return workspaceService
     }
     override fun connect(client: LanguageClient): Unit {
+        diagnosticsService.client = client
         lspClient = client
         textDocumentService.client = client
     }

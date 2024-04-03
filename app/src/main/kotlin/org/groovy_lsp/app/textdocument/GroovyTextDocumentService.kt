@@ -10,15 +10,15 @@ import org.eclipse.lsp4j.jsonrpc.json.MessageJsonHandler
 import org.eclipse.lsp4j.jsonrpc.messages.NotificationMessage
 import org.eclipse.lsp4j.jsonrpc.messages.Message
 import org.eclipse.lsp4j.PublishDiagnosticsParams
-import org.groovy_lsp.lsp.DocumentsHandler
 import org.groovy_lsp.lsp.Parse
+import org.groovy_lsp.lsp.state.HashMapBasedStateHandler
 
 
 class GroovyTextDocumentService: TextDocumentService {
 
     var client: LanguageClient? = null
 
-    val documentsHandler = DocumentsHandler()
+    val documentsHandler = HashMapBasedStateHandler()
     val parser = Parse()
 
     override fun didOpen(params: DidOpenTextDocumentParams) {
@@ -54,15 +54,12 @@ class GroovyTextDocumentService: TextDocumentService {
                     }
                     else -> {
                         documentsHandler
-                        .updateDocument(uri, change.range, change.text, version)
+                        .updateDocument(uri, change.text, version, change.range)
                     }
                 }
                 
             }
-            val text = documentsHandler.documentDirectory.get(uri)?.text
-            if (text == null) {
-                return
-            }
+            val text = documentsHandler.getDocument(uri).text
             val diagnostics = parser.parseWithErrorPosition(text)
             System.err.println("${diagnostics.size} Errors found")
             if (diagnostics.isEmpty()) {

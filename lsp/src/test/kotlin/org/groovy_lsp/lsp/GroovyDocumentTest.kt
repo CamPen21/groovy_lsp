@@ -5,12 +5,12 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.api.Assertions.assertEquals
 
-class DocumentTest {
+class GroovyDocumentTest {
 
     @ParameterizedTest
     @MethodSource("documentContents")
     fun `Document should calculate the number of lines upon intialization correctly`(text: String, lineBreaks: Int) {
-        val document = Document("", text, 1)
+        val document = GroovyDocument("", text, 1)
         assertEquals(lineBreaks, document.lineStartsPositions.size)
 
     }
@@ -18,7 +18,7 @@ class DocumentTest {
     @ParameterizedTest
     @MethodSource("documentContents")
     fun `Document should calculate the number of lines upon update correctly`(text: String, lineBreaks: Int) {
-        val document = Document("", "", 1)
+        val document = GroovyDocument("", "", 1)
         document.text = text
         assertEquals(lineBreaks, document.lineStartsPositions.size)
 
@@ -27,7 +27,7 @@ class DocumentTest {
     @ParameterizedTest
     @MethodSource("documentChange")
     fun `Document should translate from coordinate to linear position`(line: Int, column: Int, expected: Int) {
-        val document = Document("", "Line 1\nLine 2\nLine 3", 1)
+        val document = GroovyDocument("", "Line 1\nLine 2\nLine 3", 1)
         assertEquals(expected, document.transformPositionToLinear(line, column))
     }
 

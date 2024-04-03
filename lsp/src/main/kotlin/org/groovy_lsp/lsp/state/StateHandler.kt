@@ -1,17 +1,17 @@
 package org.groovy_lsp.lsp.state
 
 import org.eclipse.lsp4j.Range
-import org.groovy_lsp.lsp.Document
+import org.groovy_lsp.lsp.state.Document
 
 /* StateHandler is an object responsible for handling the state of the server.
 */
 interface StateHandler {
 
     // Get a documents state for latest version
-    fun getDocument(uri: String): Document
+    fun getDocument(uri: String): Document?
 
     // Get a documents state for a version
-    fun getDocument(uri: String, version: Int): Document
+    fun getDocument(uri: String, version: Int): Document?
 
     // Handle adding a document 
     fun addDocument(uri: String, text: String, version: Int)
