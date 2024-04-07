@@ -11,30 +11,29 @@ import org.eclipse.lsp4j.jsonrpc.messages.NotificationMessage
 import org.eclipse.lsp4j.jsonrpc.messages.Message
 import org.eclipse.lsp4j.PublishDiagnosticsParams
 import org.groovy_lsp.lsp.Parse
+import org.groovy_lsp.lsp.diagnostics.DiagnosticsService
 import org.groovy_lsp.lsp.state.HashMapBasedStateHandler
 
 
-class GroovyTextDocumentService: TextDocumentService {
-
-    var client: LanguageClient? = null
+class GroovyTextDocumentService(val diagnosticsService: DiagnosticsService): TextDocumentService {
 
     val documentsHandler = HashMapBasedStateHandler()
     val parser = Parse()
 
     override fun didOpen(params: DidOpenTextDocumentParams) {
         try {
+            val uri = params.textDocument.uri
+            val version = params.textDocument.version
             documentsHandler.addDocument(
-                params.textDocument.uri, 
+                uri, 
                 params.textDocument.text, 
                 params.textDocument.version
             )
-            val diagnostics = parser.parseWithErrorPosition(params.textDocument.text)
-            System.err.println("${diagnostics.size} Errors found")
-            if (diagnostics.isEmpty()) {
+            val document = documentsHandler.getDocument(uri, version)
+            if (document == null) {
                 return
             }
-            val notificationParams = PublishDiagnosticsParams(params.textDocument.uri, diagnostics, params.textDocument.version)
-            client?.publishDiagnostics(notificationParams)
+            diagnosticsService.analyzeDocument(document)
         } catch (e: Exception) {
             System.err.println(e.toString())
         }
@@ -59,14 +58,11 @@ class GroovyTextDocumentService: TextDocumentService {
                 }
                 
             }
-            val text = documentsHandler.getDocument(uri).text
-            val diagnostics = parser.parseWithErrorPosition(text)
-            System.err.println("${diagnostics.size} Errors found")
-            if (diagnostics.isEmpty()) {
+            val document = documentsHandler.getDocument(uri, version)
+            if (document == null) {
                 return
             }
-            val notificationParams = PublishDiagnosticsParams(uri, diagnostics, version)
-            client?.publishDiagnostics(notificationParams)
+            diagnosticsService.analyzeDocument(document)
         } catch (e: Exception) {
             System.err.println(e.toString())
         }

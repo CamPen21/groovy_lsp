@@ -5,7 +5,7 @@ import org.groovy_lsp.lsp.state.Document
 import org.eclipse.lsp4j.Position
 
 
-class GroovyDocument(var uri: String, contents: String, var version: Int): Document {
+class GroovyDocument(override val uri: String, contents: String, override var version: Int): Document {
 
     var lineStartsPositions = ArrayList<Int>()
     override var numberOfLines = 0;

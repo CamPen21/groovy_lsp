@@ -8,6 +8,8 @@ interface Document {
     var numberOfLines: Int
     var totalRange: Range
     var text: String
+    val uri: String
+    var version: Int
 
     fun update(newText: String)
 

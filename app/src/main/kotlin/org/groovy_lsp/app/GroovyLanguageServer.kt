@@ -24,9 +24,9 @@ import org.eclipse.lsp4j.DiagnosticRegistrationOptions;
 class GroovyLanguageServer: LanguageServer, LanguageClientAware {
 
     private var lspClient: LanguageClient? = null
-    private val textDocumentService = GroovyTextDocumentService()
-    private val workspaceService = GroovyWorkspaceService()
     private val diagnosticsService = GroovyDiagnosticsService()
+    private val textDocumentService = GroovyTextDocumentService(diagnosticsService)
+    private val workspaceService = GroovyWorkspaceService()
 
     override fun initialize(initializeParams: InitializeParams): CompletableFuture<InitializeResult> {
         val clientName = initializeParams.clientInfo.name;
@@ -61,10 +61,10 @@ class GroovyLanguageServer: LanguageServer, LanguageClientAware {
     override fun getWorkspaceService(): WorkspaceService {
         return workspaceService
     }
+
     override fun connect(client: LanguageClient): Unit {
         diagnosticsService.client = client
         lspClient = client
-        textDocumentService.client = client
     }
 
 }
