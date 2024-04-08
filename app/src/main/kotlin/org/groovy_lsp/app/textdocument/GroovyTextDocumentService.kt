@@ -10,7 +10,6 @@ import org.eclipse.lsp4j.jsonrpc.json.MessageJsonHandler
 import org.eclipse.lsp4j.jsonrpc.messages.NotificationMessage
 import org.eclipse.lsp4j.jsonrpc.messages.Message
 import org.eclipse.lsp4j.PublishDiagnosticsParams
-import org.groovy_lsp.lsp.Parse
 import org.groovy_lsp.lsp.diagnostics.DiagnosticsService
 import org.groovy_lsp.lsp.state.HashMapBasedStateHandler
 
@@ -18,7 +17,6 @@ import org.groovy_lsp.lsp.state.HashMapBasedStateHandler
 class GroovyTextDocumentService(val diagnosticsService: DiagnosticsService): TextDocumentService {
 
     val documentsHandler = HashMapBasedStateHandler()
-    val parser = Parse()
 
     override fun didOpen(params: DidOpenTextDocumentParams) {
         try {

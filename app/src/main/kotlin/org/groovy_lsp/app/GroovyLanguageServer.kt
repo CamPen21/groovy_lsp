@@ -1,6 +1,5 @@
 package org.groovy_lsp.app
 
-import org.groovy_lsp.lsp.Parse
 import org.groovy_lsp.lsp.diagnostics.GroovyDiagnosticsService
 import org.groovy_lsp.textdocument.GroovyTextDocumentService
 import org.groovy_lsp.workspace.GroovyWorkspaceService
