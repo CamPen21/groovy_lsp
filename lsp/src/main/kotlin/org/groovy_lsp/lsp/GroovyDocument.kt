@@ -3,6 +3,10 @@ package org.groovy_lsp.lsp;
 import org.eclipse.lsp4j.Range
 import org.groovy_lsp.lsp.state.Document
 import org.eclipse.lsp4j.Position
+import org.codehaus.groovy.control.SourceUnit
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.ErrorCollector
+import groovy.lang.GroovyClassLoader
 
 
 class GroovyDocument(override val uri: String, contents: String, override var version: Int): Document {
@@ -59,11 +63,15 @@ class GroovyDocument(override val uri: String, contents: String, override var ve
         totalRange.setEnd(Position(numberOfLines, 0))
     }
 
-    fun transformPositionToLinear(line: Int, character: Int): Int {
+    override fun transformPositionToLinear(line: Int, character: Int): Int {
         if (line >= lineStartsPositions.size) {
             return text.length
         }
         var linearPosition = lineStartsPositions[line] + character
         return linearPosition
+    }
+
+    override fun asSourceUnit(configuration: CompilerConfiguration, loader: GroovyClassLoader, er: ErrorCollector): SourceUnit {
+        return SourceUnit(this.uri, this.text, configuration, loader, er)
     }
 }

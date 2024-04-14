@@ -35,6 +35,7 @@ class GroovyLanguageServer: LanguageServer, LanguageClientAware {
         serverCapabilities.setTextDocumentSync(Incremental)
         // For now supporting inter file diagnostics, but no workspace diagnostics
         serverCapabilities.diagnosticProvider = DiagnosticRegistrationOptions(true, false)
+        serverCapabilities.hoverProvider = Either.forLeft(true)
         val result = InitializeResult(serverCapabilities)
         val promise = CompletableFuture<InitializeResult>()
         promise.complete(result)

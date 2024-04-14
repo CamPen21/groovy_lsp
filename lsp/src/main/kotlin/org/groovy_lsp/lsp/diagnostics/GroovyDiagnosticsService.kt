@@ -1,40 +1,28 @@
 package org.groovy_lsp.lsp.diagnostics
 
-import org.eclipse.lsp4j.services.LanguageClient
-import org.eclipse.lsp4j.PublishDiagnosticsParams
-import org.eclipse.lsp4j.Diagnostic
-import org.eclipse.lsp4j.Position
-import org.eclipse.lsp4j.Range
-import org.eclipse.lsp4j.DiagnosticSeverity
-import org.groovy_lsp.lsp.state.Document
+import java.util.HashMap
+import java.util.stream.Stream
+import org.apache.groovy.parser.antlr4.GroovyLangParser
+import org.codehaus.groovy.control.CompilationFailedException
+import org.codehaus.groovy.control.CompilationUnit
+import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.control.messages.SyntaxErrorMessage;
 import org.codehaus.groovy.control.messages.WarningMessage;
-import org.codehaus.groovy.control.messages.Message;
-import org.apache.groovy.parser.antlr4.GroovyLangParser
-import org.codehaus.groovy.control.CompilationUnit
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.Phases
-import org.codehaus.groovy.control.CompilationFailedException
-import com.groovy_lsp.lsp.analysis.GroovyParser
-import java.util.stream.Stream
+import org.codehaus.groovy.control.ErrorCollector
+import org.eclipse.lsp4j.Diagnostic
+import org.eclipse.lsp4j.DiagnosticSeverity
+import org.eclipse.lsp4j.Position
+import org.eclipse.lsp4j.PublishDiagnosticsParams
+import org.eclipse.lsp4j.Range
+import org.eclipse.lsp4j.services.LanguageClient
 
 class GroovyDiagnosticsService(): DiagnosticsService {
 
     override var client: LanguageClient? = null
+    val sourceUnits: HashMap<String, SourceUnit> = HashMap()
 
-    override fun analyzeDocument(document: Document) {
-        val compilerConfiguration = CompilerConfiguration()
-        compilerConfiguration.warningLevel = WarningMessage.LIKELY_ERRORS
-        val compilationUnit = CompilationUnit(compilerConfiguration)
-        compilationUnit.addSource(document.uri, document.text)
+    override fun consumeErrorCollector(documentUri: String, documentVersion: Int, ec: ErrorCollector) {
         var diagnostics = ArrayList<Diagnostic>()
-        try {
-            compilationUnit.compile(Phases.CLASS_GENERATION)
-            System.err.println("Compilation succeeded")
-        } catch (e: CompilationFailedException) {
-            // Just catch the exception
-        }
-        val ec = compilationUnit.errorCollector
         val warningMessages = ec.warnings
         val errorMessages = ec.errors
         if (warningMessages != null) {
@@ -47,7 +35,7 @@ class GroovyDiagnosticsService(): DiagnosticsService {
             System.err.println("${errorDiagnostics.size} Errors")
             diagnostics.addAll(errorDiagnostics)
         }
-        val diagnosticsNotification = PublishDiagnosticsParams(document.uri, diagnostics, document.version)
+        val diagnosticsNotification = PublishDiagnosticsParams(documentUri, diagnostics, documentVersion)
         notifyDiagnostics(diagnosticsNotification)
     }
 

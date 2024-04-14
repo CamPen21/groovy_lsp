@@ -2,6 +2,7 @@ package org.groovy_lsp.lsp.state
 
 import org.eclipse.lsp4j.Range
 import org.groovy_lsp.lsp.state.Document
+import groovy.lang.GroovyClassLoader
 
 /* StateHandler is an object responsible for handling the state of the server.
 */
@@ -14,11 +15,14 @@ interface StateHandler {
     fun getDocument(uri: String, version: Int): Document?
 
     // Handle adding a document 
-    fun addDocument(uri: String, text: String, version: Int)
+    fun addDocument(uri: String, text: String, version: Int): Document
 
     // Handle updating a document upon a full text update
-    fun updateDocument(uri: String, text: String, version: Int)
+    fun updateDocument(uri: String, text: String, version: Int): Document
 
     // Handle updating a document upon a range text update
-    fun updateDocument(uri: String, text: String, version: Int, range: Range)
+    fun updateDocument(uri: String, text: String, version: Int, range: Range): Document
+
+    // Retrieve the classLoader that encapsulates the state
+    fun getClassLoader(): GroovyClassLoader
 }
